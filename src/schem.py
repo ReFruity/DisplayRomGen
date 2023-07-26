@@ -1,4 +1,5 @@
 import mcschematic
+import numpy as np
 
 AIR = 'minecraft:air'
 TORCH = 'minecraft:redstone_wall_torch[facing=north,lit=false]'
@@ -72,16 +73,38 @@ class DisplayRomBuilder:
 
 
 def generate_schem(filepath: str):
+    np_frames_raw = np.fromfile('assets/sample1.pickle', dtype=np.int8)
+    print(np_frames_raw.shape)
+    np_frames = np_frames_raw.reshape(26, 32, 32)
+    print(np_frames.shape)
+
     builder = DisplayRomBuilder()
-    # builder.inspect()
-    for frame in range(FRAMES):
+
+    for frame_index in range(FRAMES):
         for x in range(SCREEN_SIZE):
             for y in range(SCREEN_SIZE):
-                if x > frame or y > frame:
-                    builder.write_pixel(frame=frame, x=x, y=y, value=False)
+                pixel = np_frames[frame_index][SCREEN_SIZE - y - 1][x]
+
+                if pixel == 1:
+                    builder.write_pixel(frame=frame_index, x=x, y=y, value=True)
+                else:
+                    builder.write_pixel(frame=frame_index, x=x, y=y, value=False)
+
+    # for frame in range(len(np_frames)):
+    #     for row in range(len(frame)):
+    #         for x in range(len(x))
+
+    # # builder.inspect()
+    # for frame in range(FRAMES):
+    #     for x in range(SCREEN_SIZE):
+    #         for y in range(SCREEN_SIZE):
+    #             if y + x == frame * 2 or y + x == 2 * SCREEN_SIZE - frame * 2:
+    #                 builder.write_pixel(frame=frame, x=x, y=y, value=True)
+    #             else:
+    #                 builder.write_pixel(frame=frame, x=x, y=y, value=False)
 
     builder.save('modified')
 
 
 if __name__ == '__main__':
-    generate_schem('schems/input.txt')
+    generate_schem('video/sample1.mp4')
